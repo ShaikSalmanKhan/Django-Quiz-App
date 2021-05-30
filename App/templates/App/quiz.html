@@ -1,0 +1,180 @@
+{% extends 'App/base.html' %}
+{% block title %} Quiz Page {% endblock %}
+
+{% block content %}
+
+       <!-- if we get data from 'Trivia API'  without any error -->
+       {% if quiz_questions != "Maximum Limit Reached Please try again" %}
+
+                 <!-- Quiz Section (contains Question,Four Options,Next Button) -->
+                  <div class="quiz_section">
+
+                            <!-- Question -->
+                            <h2 class="question">Each Question Place</h2>
+
+                            <!-- Four Options -->
+                            <div class="option_1_style">
+                                <input type="radio" name="options_family" class="options_family" id="options_family_1" >
+                                <label for="options_family_1" id="option_1">option_1</label>
+                            </div>
+
+                            <div class="option_2_style">
+                                <input type="radio" name="options_family"  class="options_family" id="options_family_2">
+                                <label for="options_family_2" id="option_2">option_2</label>
+                            </div>
+
+                            <div class="option_3_style">
+                                <input type="radio" name="options_family"  class="options_family" id="options_family_3">
+                                <label for="options_family_3" id="option_3">option_3</label>
+                            </div>
+
+                            <div class="option_4_style">
+                                <input type="radio" name="options_family" class="options_family" id="options_family_4">
+                                <label for="options_family_4" id="option_4">option_4</label>
+                            </div>
+
+                            <!-- Next Button -->
+                            <button class="next" onclick="next_button_clicked();">Next</button>
+                  </div>
+
+        <!-- if we get data from 'Trivia API' with Error -->
+        {% else %}
+                  <div class="home">
+                            <h2>{{quiz_questions}} (or) goto</h2>
+                            <button type="button" class="next" onclick="window.location.href='{% url 'home' %}'">Home Page</button>
+                  </div>
+        {% endif %}
+
+          <!-- Javascript -->
+          <script type="text/javascript">
+
+                const quiz_questions = JSON.parse("{{quiz_questions|escapejs}}")
+
+                if (quiz_questions != "Maximum Limit Reached Please try again") {
+                          const current_question     = document.querySelector('.question');
+                          const option_1             = document.querySelector('#option_1');
+                          const option_2             = document.querySelector('#option_2');
+                          const option_3             = document.querySelector('#option_3');
+                          const option_4             = document.querySelector('#option_4');
+                          const options_list         = document.querySelectorAll('.options_family');
+                          const next_button          = document.querySelector('.next');
+
+                           // this store question count after each question increment it by 1
+                          let count             =  0
+                          let score             =  0  // this store User Score
+                          let remove_color      =  '' // this store colors to remove
+                          let user_answers      =  [] // this list will store all user answers
+                          let time              =  0  // this store time taken by user to complete the quiz
+
+
+                          // this function will insert question & options in Quiz Section
+                          function load_question_and_options() {
+                                  // if count value is not equal to quiz_questions.length then load question_and_options
+                                  if (count != quiz_questions.length) {
+                                        current_question.innerText = quiz_questions[count].question
+                                        option_1.innerText         = quiz_questions[count].options[0]
+                                        option_2.innerText         = quiz_questions[count].options[1]
+                                        option_3.innerText         = quiz_questions[count].options[2]
+                                        option_4.innerText         = quiz_questions[count].options[3]
+                                        next_button.disabled       = false
+
+                                  }
+                                  // if count value is equal to quiz_questions.length that means Quiz is Over
+                                  // save score,user_answers,time to database & goto result_page
+                                  else {
+                                        if (save_to_database() == 0)
+                                              window.location.href = "{% url 'result' %}"
+                                  }
+                          }
+
+
+                          // this function will save score & user_answers ,time to database
+                          function save_to_database() {
+                                    var url     = '/save_to_database?score=' + score+ '&user_answers=' +  JSON.stringify(user_answers)+ '&time=' + time
+                                    var request  = new XMLHttpRequest();
+                                    request.open("GET", url, true);
+                                    request.send();
+                                    return request.status
+                            }
+
+                            // this func will show correct_answer color to green
+                           function show_correct_answer_color_to_green(current_correct_answer){
+                                 for (j = 1; j <= 4; j++){
+                                     if (document.querySelector('#option_'+ j).innerText == current_correct_answer) {
+                                         remove_color = '.option_'+ j+'_style'
+                                         document.querySelector('.option_'+ j+'_style').style.backgroundColor = "green";
+                                         break;
+                                     }
+                                 }
+                            }
+
+
+                          // this func will check user selected answer against correct_answer
+                          function check_answer() {
+                                  // iterating over the options_list to find checked radio buttton using checked
+                                  for (i = 0; i < options_list.length; i++) {
+                                          if (options_list[i].checked) {
+
+                                                // getting user_selected_answer & correct_answer
+                                                user_selected_answer = document.querySelector('#option_'+ (i+1)).innerText
+                                                correct_answer       = quiz_questions[count].correct_answer
+
+                                                // adding selected radio button to the user_answers list
+                                                user_answers.push(i);
+
+                                                // if user selected the 'RIGHT' correct_answer-->then increment score by 1 & change option color to green
+                                                if (user_selected_answer == correct_answer) {
+                                                        score += 1
+                                                        document.querySelector('.option_'+ (i+1)+'_style').style.backgroundColor = "green";
+                                                        remove_color = '.option_'+ (i+1)+'_style'
+                                                } else {
+                                                        show_correct_answer_color_to_green(correct_answer)
+                                                }
+
+                                                // unchecking the radio button
+                                                options_list[i].checked = false
+                                                return true
+                                          }
+                                  }
+                                  return false
+                           }
+
+
+                          // this func will remove option color from GREEN to teal
+                          function remove_option_color(){
+                                document.querySelector(remove_color).style.backgroundColor = "teal";
+                          }
+
+
+                          // this func will run if NEXT button is clicked
+                          function next_button_clicked() {
+
+                                if (check_answer() == true) {
+                                     // if user selcted a option then disable next button,incr count,load next question and option
+                                     next_button.disabled = true
+                                     count += 1
+                                     // after 1.5s it will load a new question in Quiz Section
+                                     setTimeout(function(){load_question_and_options();remove_option_color();}, 800);
+
+                                } else {
+                                      alert("Please choose a answer")
+
+                                }
+                          }
+
+
+                          // this func will increment time variable by 1 for each 1 sec
+                          function timer() {
+                                  setInterval(function(){ time += 1 }, 1000);
+                          }
+
+
+                          // for first time calling this function
+                          load_question_and_options();
+                          timer()
+
+                }
+
+              </script>
+
+{% endblock %}

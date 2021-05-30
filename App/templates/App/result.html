@@ -1,0 +1,75 @@
+{% extends 'App/base.html' %}
+{% block title %} Result Page {% endblock %}
+
+
+{% block content %}
+
+        <!-- if User didn't taken the quiz -->
+        {% if questions.0.user_answer == '' or questions == '' %}
+                  <div class="home">
+                          <h2> Please Start the Quiz by going to HomePage => goto</h2>
+                          <button type="button" class="next" onclick="window.location.href='{% url 'home' %}'">Home Page</button>
+                 </div>
+
+        <!-- if User taken the quiz -->
+        {% else %}
+                  <!-- Score Section contains all User Score,Time Taken -->
+                  <div class="quiz_history">
+                         <h3>Score</h3>
+                         <h2 style="color:#99154e;">==>{{score}}/{{questions|length}}<==</h2>
+                         <h3>Time Taken</h3>
+                         <h2 style="color:#99154e;">==>{{time}}<==</h2>
+
+                          {% if score >= 7 %}
+                                <h3>{{"Congrats You Passed the Quiz goto"}}</h3>
+                          {% else %}
+                                <h3>{{"You Failed the Quiz goto"}}</h3>
+                          {% endif %}
+
+                          <button type="button" class="next" onclick="window.location.href='{% url 'dashboard' %}' ">Dashboard</button> (or)
+                          <button type="button" class="next" onclick="window.location.href='{% url 'home' %}' ">Start a New Quiz</button>
+                  </div>
+
+                  <!-- Quiz History instructions -->
+                  <div class="quiz_history">
+                          <h2>Quiz History</h2>
+                          <span style='font-size:40px;color:green'>&#9632;</span> Correct Answer
+                          <span style='font-size:40px;color:red'>&#9632;</span> You Selected Wrong Answer
+                          <span style='font-size:40px;color:#99154e'>&#9632;</span> You Selected Right Answer
+                  </div>
+
+                  <!-- Quiz History Section -->
+                  {% for each_question in questions %}
+                            <!-- Quiz History (contains Question,Four Options) -->
+                            <div class="quiz_section">
+                                      <!-- Question -->
+                                      <h2 class="question">{{each_question.question}}</h2>
+
+                                      <!-- Each option with colors -->
+                                      {% for each_option in each_question.options %}
+                                            <div class="result" style="background-color:
+                                                  {% if each_option == each_question.correct_answer and each_option == each_question.user_answer %}
+                                                        {{"#99154e"}}
+                                                  {% else %}
+                                                        {% if each_option == each_question.correct_answer %}
+                                                              {{"green"}}
+                                                        {% endif %}
+
+                                                        {% if each_option == each_question.user_answer %}
+                                                              {{"red"}}
+                                                        {% endif %}
+                                                  {% endif %}
+                                                  ">
+                                                <input type="radio" id="option">
+                                                <label for="option">{{each_option}}</label>
+                                            </div>
+                                      {% endfor%}
+                              </div>
+                 {% endfor %}
+                 <!--  Quiz History Section End -->
+
+        {% endif %}
+
+
+
+{% endblock %}

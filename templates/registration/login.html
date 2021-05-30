@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+      <head>
+        <title>Login Page</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+      </head>
+
+      <body>
+        <div class="home">
+            <h2>Login to play the Quiz</h2> <br>
+
+            <form method="post" action="{% url 'login' %}">
+                  {% csrf_token %}
+                      <h2>
+                      {% if form.errors %}
+                           <p style="color:red">Your username and password didn't match. Please try again.</p>
+                      {% endif %}
+
+
+                      {{ form.username.label_tag }}
+                      {{ form.username }} <br>
+
+                      {{ form.password.label_tag }}
+                      {{ form.password }} <br> <br>
+
+                  <button type="submit" value="login" class="next" name="button">Login</button>
+                      </h2>
+
+            </form>
+
+
+       </div>
+      </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

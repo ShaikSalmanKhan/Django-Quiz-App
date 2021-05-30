@@ -1,0 +1,16 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+      <head>
+            <!-- Every Page which extends will override their title -->
+            <title>{% block title %} {% endblock %}</title>
+            <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+      </head>
+
+      <body>
+            <!-- Every Page which extends will override their content -->
+            {% block content %}
+
+            {% endblock %}
+      </body>
+</html>

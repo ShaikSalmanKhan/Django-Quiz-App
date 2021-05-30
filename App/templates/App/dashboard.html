@@ -1,0 +1,51 @@
+{% extends 'App/base.html' %}
+{% load custom_filters %}
+{% block title %} Dashboard Page {% endblock %}
+
+
+{% block content %}
+            <!-- Home Page Tab Link -->
+            <div class="home">
+                  <h1>Dashboard</h1>
+                  <button type="button" class="next" onclick="window.location.href='{% url 'home' %}'">Home Page</button>
+            </div>
+
+            <!-- if quiz_query_set is not empty display all quiz data -->
+            {% if quiz_query_set %}
+                    <!-- iterating over each_quiz in quiz_query_set and displaying each quiz in table -->
+                    {% for each_quiz in quiz_query_set %}
+                            <table class="dashboard_table">
+                                    <tr>
+                                          <th>Trivia API link</th>
+                                          <td>{{each_quiz.trivia_api_link}}</td>
+                                    </tr>
+                                    <tr>
+                                          <th>Date</th>
+                                          <td>{{each_quiz.created_date}}</td>
+                                    </tr>
+                                    <tr>
+                                          <th>Score</th>
+                                          <td>{{each_quiz.score}}</td>
+                                    </tr>
+                                     <tr>
+                                          <th>Time Taken</th>
+                                          <td>{{each_quiz.time_taken}}</td>
+                                    </tr>
+                                    <tr>
+                                         <th>User Answers</th>
+                                         <td style="background-color:white;padding:20px 0;border:solid teal;">
+                                               <!-- using a custom filter 'convert_string_to_list' that will convert string to list  -->
+                                               {% for answer in each_quiz.user_answers|convert_string_to_list %}
+                                                      {{answer}} <br>
+                                               {% endfor %}
+                                         </td>
+                                    </tr>
+                            </table>
+                    {% endfor %}
+
+            <!-- if quiz_query_set is empty display 'No Record Found' -->
+            {% else %}
+                    <h2 class="dashboard_table">No Record Found</h2>
+            {% endif %}
+
+{% endblock %}

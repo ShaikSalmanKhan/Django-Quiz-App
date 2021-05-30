@@ -1,0 +1,77 @@
+{% extends 'App/base.html' %}
+{% block title %} Homepage {% endblock %}
+
+
+{% block content %}
+        <!-- Home Page section contains Two buttons & Six radio button -->
+        <div class="home">
+
+                  <!-- Two buttons Logout & Dashboard -->
+                  <h1>Quiz</h1>
+                  <button type="button" class="next" onclick="window.location.href='{% url 'logout' %}' ">Logout</button>
+                  <button type="button" class="next" onclick="window.location.href='{% url 'dashboard' %}' ">Dashboard</button>
+
+                  <!-- Form that contains 6 radio button -->
+                  <form  action="{% url 'quiz' %}" method="post" id="form">
+                          {% csrf_token %}
+                          <h2>Select Category:</h2>
+
+                          <!-- Radio buttons -->
+                          <div class="category_style">
+                                  <input type="radio" name="category" class="category" value="25">
+                                  <label>Art</label>
+                          </div>
+                          <div class="category_style">
+                                  <input type="radio" name="category" class="category" value="24">
+                                  <label >Politics</label>
+                          </div>
+                          <div class="category_style">
+                                  <input type="radio" name="category" class="category" value="21">
+                                  <label>Sports</label>
+                          </div>
+                          <div class="category_style">
+                                  <input type="radio" name="category" class="category" value="9">
+                                  <label>General Knowledge</label>
+                          </div>
+                          <div class="category_style">
+                                  <input type="radio" name="category" class="category" value="23">
+                                  <label>History</label>
+                          </div>
+                          <div class="category_style">
+                                  <input type="radio" name="category" class="category" value="26">
+                                  <label>Celebrities</label>
+                          </div>
+
+                          <!-- Start a new Quiz button -->
+                          <button type="button"  class="next" onclick="check()">Start a New Quiz</button>
+                  </form>
+
+        </div>
+                  <script type="text/javascript">
+                  const category_list = document.querySelectorAll('.category');
+
+                  // this will iterate over the category_list to check if user selected a category
+                  function user_selected_category(){
+                        for (i = 0; i < category_list.length; i++) {
+                              if (category_list[i].checked){
+                                    category = category_list[i].value
+                                    return true
+                              }
+                          }
+                          return false
+                  }
+
+
+                  // this will check if user selcted a  Category if not Alert him a "Please choose a category"
+                  function check(){
+                        if (user_selected_category() == true) {
+                            form.submit()
+
+                        } else {
+                            alert("Please choose a category")
+                        }
+                  }
+
+</script>
+
+{% endblock %}
